@@ -66,8 +66,8 @@ func (r *InMemoryUserRepository) GetByEmail(email string) (*domain.User, error) 
 type InMemoryAuthRepository struct {
 	auths             map[int]*domain.Authentication
 	counter           int
-	tokenMap          map[string]int  // map token to userID
-	invalidatedTokens map[string]bool // set of invalidated tokens
+	tokenMap          map[string]int  
+	invalidatedTokens map[string]bool 
 	mu                sync.RWMutex
 }
 
@@ -130,33 +130,22 @@ func (r *InMemoryAuthRepository) UpdateLogout(userID int, logoutTime time.Time) 
 		return errors.New("authentication not found")
 	}
 
-	// Tandai token sebagai tidak valid
 	if auth.Token != "" {
-		oldToken := auth.Token // Simpan token lama
+		oldToken := auth.Token 
 		r.invalidatedTokens[oldToken] = true
-		// Hapus dari tokenMap aktif
 		delete(r.tokenMap, oldToken)
 	}
-
-	// Catat waktu logout
 	auth.LogoutAt = logoutTime
-	// Bersihkan token
-	auth.Token = "" // Hapus token
-
+	auth.Token = "" 
 	return nil
 }
 
-// infrastructure/in_memory_user_repo.go - Perbaikan fungsi VerifyToken
 func (r *InMemoryAuthRepository) VerifyToken(token string) (*domain.Authentication, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-
-	// Periksa apakah token telah diinvalidasi
 	if _, invalid := r.invalidatedTokens[token]; invalid {
 		return nil, errors.New("token has been invalidated")
 	}
-
-	// Cek apakah token ada di map aktif
 	userID, exists := r.tokenMap[token]
 	if !exists {
 		return nil, errors.New("invalid token")
@@ -166,8 +155,7 @@ func (r *InMemoryAuthRepository) VerifyToken(token string) (*domain.Authenticati
 	if !exists {
 		return nil, errors.New("authentication not found")
 	}
-
-	// Periksa apakah token cocok dengan yang tersimpan
+	
 	if auth.Token != token {
 		return nil, errors.New("token mismatch")
 	}
