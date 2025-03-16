@@ -1,86 +1,93 @@
 # User Management App
 
-## Deskripsi
-User Management App adalah aplikasi yang memungkinkan pengguna untuk mendaftar, masuk, mendapatkan profil, dan keluar. Aplikasi ini dibangun menggunakan Go dan framework Gin untuk menangani HTTP routing.
+Aplikasi Manajemen Pengguna ini adalah aplikasi berbasis web yang memungkinkan pengguna untuk mendaftar, masuk, mendapatkan profil, dan keluar. Aplikasi ini dibangun menggunakan Go dan framework Gin.
 
 ## Fitur
-- **Pendaftaran Pengguna**: Pengguna dapat mendaftar dengan memberikan email dan password.
-- **Login**: Pengguna dapat masuk ke aplikasi menggunakan email dan password.
+
+- **Pendaftaran Pengguna**: Pengguna dapat mendaftar dengan email dan password.
+- **Login**: Pengguna dapat masuk menggunakan email dan password.
 - **Profil Pengguna**: Pengguna dapat melihat informasi profil mereka setelah login.
 - **Logout**: Pengguna dapat keluar dari aplikasi.
 
-## Arsitektur
-Aplikasi ini terdiri dari beberapa komponen utama:
-
-1. **Router**: Mengatur rute HTTP untuk berbagai endpoint.
-2. **Controller**: Mengelola logika bisnis untuk setiap endpoint.
-3. **UseCase**: Mengelola interaksi antara controller dan repositori.
-4. **Repository**: Menyimpan dan mengelola data pengguna dan autentikasi dalam memori.
-
 ## Alur Aplikasi
 
-### 1. Inisialisasi
-Aplikasi dimulai dengan menginisialisasi repositori pengguna dan autentikasi, serta layanan JWT dan password hashing.
+1. **Pendaftaran**:
+   - Pengguna mengirimkan permintaan POST ke endpoint `/register` dengan data JSON yang berisi email dan password.
+   - Jika pendaftaran berhasil, pengguna akan ditambahkan ke database.
 
-```go
-userRepo := infrastructure.NewInMemoryUserRepository()
-authRepo := infrastructure.NewInMemoryAuthRepository()
-jwtService := infrastructure.NewJWTService("your-secret-key", 24*time.Hour)
-passwordHasher := infrastructure.NewBcryptPasswordHasher(10)
-```
+2. **Login**:
+   - Pengguna mengirimkan permintaan POST ke endpoint `/login` dengan data JSON yang berisi email dan password.
+   - Jika login berhasil, pengguna akan menerima token yang dapat digunakan untuk mengakses endpoint yang dilindungi.
 
-### 2. Penggunaan UseCase
-Setelah repositori dan layanan diinisialisasi, kita membuat instance dari `UserUseCase` dan `AuthUseCase` yang akan digunakan oleh controller.
+3. **Melihat Profil**:
+   - Pengguna yang telah login dapat mengakses endpoint `/profile` untuk melihat informasi profil mereka.
+   - Endpoint ini dilindungi oleh middleware autentikasi yang memverifikasi token.
 
-```go
-userUseCase := usecase.NewUserUseCase(userRepo, authRepo, passwordHasher, jwtService)
-authUseCase := usecase.NewAuthUseCase(userRepo, authRepo, passwordHasher, jwtService)
-```
+4. **Logout**:
+   - Pengguna dapat mengirimkan permintaan POST ke endpoint `/logout` untuk keluar dari aplikasi.
+   - Token yang digunakan akan diinvalidasi.
 
-### 3. Controller
-Controller `UserController` dibuat dengan menghubungkan use case yang telah dibuat sebelumnya.
+## Cara Menggunakan dengan Postman
 
-```go
-userController := http.NewUserController(userUseCase, authUseCase)
-```
+### Prasyarat
 
-### 4. Routing
-Router Gin digunakan untuk mendefinisikan endpoint yang dapat diakses oleh pengguna. Endpoint yang tersedia meliputi:
-- `POST /register`: Untuk mendaftar pengguna baru.
-- `POST /login`: Untuk masuk ke aplikasi.
-- `GET /profile`: Untuk mendapatkan informasi profil pengguna (diperlukan autentikasi).
-- `POST /logout`: Untuk keluar dari aplikasi (diperlukan autentikasi).
+- Pastikan Anda telah menginstal Go di sistem Anda.
+- Pastikan Anda memiliki akses ke terminal atau command prompt.
+- Pastikan Anda telah menginstal Postman.
 
-```go
-router.POST("/register", userController.Register)
-router.POST("/login", userController.Login)
+### Instalasi
 
-protected := router.Group("/")
-protected.Use(userController.AuthMiddleware())
-{
-    protected.GET("/profile", userController.GetProfile)
-    protected.POST("/logout", userController.Logout)
-}
-```
+1. **Clone Repository**:
+   ```bash
+   git clone <URL_REPOSITORY>
+   cd <NAMA_FOLDER>
+   ```
 
-### 5. Menjalankan Server
-Akhirnya, server dijalankan pada port 8080.
+2. **Instal Dependensi**:
+   ```bash
+   go mod tidy
+   ```
 
-```go
-if err := router.Run(":8080"); err != nil {
-    log.Fatalf("Failed to start server: %v", err)
-}
-```
-
-## Cara Menjalankan Aplikasi
-1. Pastikan Anda memiliki Go terinstal di sistem Anda.
-2. Clone repositori ini.
-3. Jalankan perintah berikut untuk memulai aplikasi:
+3. **Jalankan Aplikasi**:
    ```bash
    go run cmd/main.go
    ```
-4. Akses aplikasi melalui `http://localhost:8080`.
 
-## Catatan
-- Pastikan untuk mengganti `your-secret-key` dengan kunci rahasia yang aman untuk JWT.
-- Aplikasi ini menggunakan penyimpanan dalam memori, sehingga data tidak akan persisten setelah aplikasi dimatikan.
+4. **Akses Aplikasi**:
+   - Buka browser dan akses `http://localhost:8080`.
+
+### Menggunakan Postman
+
+1. **Pendaftaran Pengguna**
+   - **Method**: POST
+   - **URL**: `http://localhost:8080/register`
+   - **Body**: Pilih `raw` dan `JSON`, lalu masukkan:
+     ```json
+     {
+       "email": "user@example.com",
+       "password": "password123"
+     }
+     ```
+
+2. **Login Pengguna**
+   - **Method**: POST
+   - **URL**: `http://localhost:8080/login`
+   - **Body**: Pilih `raw` dan `JSON`, lalu masukkan:
+     ```json
+     {
+       "email": "user@example.com",
+       "password": "password123"
+     }
+     ```
+
+3. **Melihat Profil**
+   - **Method**: GET
+   - **URL**: `http://localhost:8080/profile`
+   - **Headers**: Tambahkan header `Authorization` dengan nilai `Bearer <TOKEN>` (ganti `<TOKEN>` dengan token yang didapat dari login).
+
+4. **Logout Pengguna**
+   - **Method**: POST
+   - **URL**: `http://localhost:8080/logout`
+   - **Headers**: Tambahkan header `Authorization` dengan nilai `Bearer <TOKEN>` (ganti `<TOKEN>` dengan token yang didapat dari login).
+
+## Struktur Proyek
