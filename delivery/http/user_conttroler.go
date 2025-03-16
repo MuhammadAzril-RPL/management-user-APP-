@@ -70,26 +70,18 @@ func (ctrl *UserController) GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// delivery/http/user_controller.go - Perbaikan fungsi Logout
-// delivery/http/user_controller.go - Perbaiki fungsi Logout
 func (ctrl *UserController) Logout(c *gin.Context) {
     userID, exists := c.Get("userID")
     if !exists {
         c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
         return
     }
-
-    // Ambil data auth sebelum logout untuk mendapatkan waktu login
     auth, err := ctrl.authUseCase.GetAuthData(userID.(int))
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "could not retrieve authentication data"})
         return
     }
-    
-    // Simpan login time untuk response
     loginTime := auth.LoginAt
-    
-    // Proses logout
     logoutTime := time.Now()
     err = ctrl.authUseCase.Logout(userID.(int))
     if err != nil {
@@ -97,7 +89,6 @@ func (ctrl *UserController) Logout(c *gin.Context) {
         return
     }
 
-    // Response dengan informasi waktu login dan logout
     c.JSON(http.StatusOK, gin.H{
         "message": "logout successful",
         "login_at": loginTime,
@@ -105,7 +96,6 @@ func (ctrl *UserController) Logout(c *gin.Context) {
     })
 }
 
-// delivery/http/user_controller.go - Perbaiki AuthMiddleware
 func (ctrl *UserController) AuthMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
         tokenString := c.GetHeader("Authorization")
@@ -114,19 +104,16 @@ func (ctrl *UserController) AuthMiddleware() gin.HandlerFunc {
             return
         }
 
-        // Remove "Bearer " prefix if present
         if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
             tokenString = tokenString[7:]
         }
-
-        // Validasi token
+	    
         userID, err := ctrl.authUseCase.ValidateToken(tokenString)
         if err != nil {
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
             return
         }
-
-        // Pengecekan tambahan di repository untuk memastikan token belum diinvalidasi
+	    
         auth, err := ctrl.authUseCase.GetAuthData(userID)
         if err != nil || auth.Token != tokenString || !auth.LogoutAt.IsZero() {
             c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token invalid or session expired"})
