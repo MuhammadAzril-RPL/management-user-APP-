@@ -1,6 +1,6 @@
 # User Management App
 
-Aplikasi Manajemen Pengguna ini adalah aplikasi berbasis web yang memungkinkan pengguna untuk mendaftar, masuk, mendapatkan profil, dan keluar. Aplikasi ini dibangun menggunakan Go dan framework Gin.
+Aplikasi Manajemen Pengguna ini adalah aplikasi yang memungkinkan pengguna untuk mendaftar, masuk, mendapatkan profil, dan keluar. Aplikasi ini dibangun menggunakan Go dan framework Gin.
 
 ## Fitur
 
