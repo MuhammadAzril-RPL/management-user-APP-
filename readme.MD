@@ -32,29 +32,7 @@ Aplikasi Manajemen Pengguna ini adalah aplikasi berbasis web yang memungkinkan p
 ### Prasyarat
 
 - Pastikan Anda telah menginstal Go di sistem Anda.
-- Pastikan Anda memiliki akses ke terminal atau command prompt.
 - Pastikan Anda telah menginstal Postman.
-
-### Instalasi
-
-1. **Clone Repository**:
-   ```bash
-   git clone <URL_REPOSITORY>
-   cd <NAMA_FOLDER>
-   ```
-
-2. **Instal Dependensi**:
-   ```bash
-   go mod tidy
-   ```
-
-3. **Jalankan Aplikasi**:
-   ```bash
-   go run cmd/main.go
-   ```
-
-4. **Akses Aplikasi**:
-   - Buka browser dan akses `http://localhost:8080`.
 
 ### Menggunakan Postman
 
@@ -89,5 +67,3 @@ Aplikasi Manajemen Pengguna ini adalah aplikasi berbasis web yang memungkinkan p
    - **Method**: POST
    - **URL**: `http://localhost:8080/logout`
    - **Headers**: Tambahkan header `Authorization` dengan nilai `Bearer <TOKEN>` (ganti `<TOKEN>` dengan token yang didapat dari login).
-
-## Struktur Proyek
