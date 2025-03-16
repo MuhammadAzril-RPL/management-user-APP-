@@ -84,9 +84,3 @@ if err := router.Run(":8080"); err != nil {
 ## Catatan
 - Pastikan untuk mengganti `your-secret-key` dengan kunci rahasia yang aman untuk JWT.
 - Aplikasi ini menggunakan penyimpanan dalam memori, sehingga data tidak akan persisten setelah aplikasi dimatikan.
-
-## Kontribusi
-Jika Anda ingin berkontribusi pada proyek ini, silakan buat pull request atau buka isu untuk diskusi.
-
-## Lisensi
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
