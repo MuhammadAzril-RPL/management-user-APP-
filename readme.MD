@@ -42,6 +42,7 @@ Aplikasi Manajemen Pengguna ini adalah aplikasi yang memungkinkan pengguna untuk
    - **Body**: Pilih `raw` dan `JSON`, lalu masukkan:
      ```json
      {
+       "Nama" : "User",
        "email": "user@example.com",
        "password": "password123"
      }
